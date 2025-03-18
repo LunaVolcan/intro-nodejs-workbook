@@ -1,6 +1,6 @@
 // Run the following file with the node command in the terminal.
 
-const number = 29; // You can change this number to test others
+const number = 35; // You can change this number to test others
 let isPrime = true;
 
 if (number === 1) {
