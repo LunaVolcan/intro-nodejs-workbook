@@ -1,71 +1,54 @@
-const express = require("express"); //external module that will allow us to build a web server
-const fs = require("fs"); //external module that will allow us to read and write files
+import express from 'express'; // 3rd party module
 
-const app = express(); // creating an instance of the express module so that we use all the methods/functions and properties in our web server
-const port = 3000; // Tellling express which port to listen to, to receive requests
+import fs from 'fs'; // internal module
 
-app.use(express.json()); // This server will be receiving and responding in JSON
+const app = express(); 
 
-//Create the function that will turn on thew serve and listen for requests on this port
+const port = 3000;
+app.use(express.json());    
+
 app.listen(port, () => {
-  console.log(`My server is listening on port: ${port}`);
+    console.log(`Server is running on port ${port}`);
 });
 
-//Sendiing a string
-// app.get("/", (req, res) => {
-//   res.send("I am gay");
-// });
-
-//Sending data
-// app.get("/", (req, res) => {
+// app.get('/', (req, res) => {
 //     const myData = {
-//         id: 47,
-//         email: "test@test.com"
-//     };
-//     const myJSONData = JSON.stringify(myData);
-//     res.send(myJSONData);
+//         id: 1,
+//         name: 'John',
+//         age: 30
+//     }
+//     const myJsonData = JSON.stringify(myData);
+//     res.send(myJsonData);
 // });
 
-//Specify a route
-// app.get("/user", (req, res) => {
-//     const myData = {
-//         id: 47,
-//         email: "test@test.com"
-//     };
-//     const myJSONData = JSON.stringify(myData);
-//     res.send(myJSONData);
-// });
+app.get('/user', (_, res) => {
+    const myData = {
+        id: 1,
+        name: 'John',
+        age: 30
+    }
+    const myJsonData = JSON.stringify(myData);
+    res.send(myJsonData);
+});
+//Helper Functions 
 
-//Specify a route with a parameter
-// app.get("/users/:user", (req, res) => {
-//     const myData = {
-//         id: req.params.user,
-//         email: "test@test.com"
-//     };
-//     const myJSONData = JSON.stringify(myData);
-//     res.send(myJSONData);
-// });
-
-// Helper functions
 function getAllBooks() {
-    //this gets all  ofthe book data 
-    const books = fs.readFile('../data.json', 'utf8', (err, data) => {
+    //this gets all the book data 
+    const books = fs.readFile('../data.json', 'utf8', (_, data) => {
     return JSON.parse(data);
     });
     return books;
 }
 
-// API Endpoint
 
-// The client has requested all of the books
-app.get("get-all-books", async (req, res) => {
-    const books = await getAllBooks();
+//the user has requested all books data 
+app.get("/get-all-books", async (_, res) => {
+    const books = getAllBooks();
     res.send(JSON.stringify(books));
 });
 
-app.get("get-one-book/:id", async (req, res) => {
+app.get('/get-one-book/:id', async (req, res) => {
     const book = await getOneBook(req.params.id);
     res.send(JSON.stringify(book));
-  });
-
+});
 
