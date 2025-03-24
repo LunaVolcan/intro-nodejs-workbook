@@ -1,54 +1,89 @@
-import express from 'express'; // 3rd party module
+const express = require("express"); // external module that will allow us to build a web server
+const fs = require("fs").promises; // external module that will allow us to read and write files
 
-import fs from 'fs'; // internal module
+const app = express(); // creating an instance of the express module so that we can use all the methods/functions and properties in our web server
+const port = 3000; // telling express which port to listen to, to receive requests
 
-const app = express(); 
+app.use(express.json()); // this server will be receiving and responding in JSON
 
-const port = 3000;
-app.use(express.json());    
-
+// Create the function that will turn on the server and listen for requests on this port
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+  console.log(`My server is listening on port: ${port}`);
 });
 
-// app.get('/', (req, res) => {
-//     const myData = {
-//         id: 1,
-//         name: 'John',
-//         age: 30
-//     }
-//     const myJsonData = JSON.stringify(myData);
-//     res.send(myJsonData);
+// Sending a string
+// app.get("/", (req, res) => {
+//   res.send("I am gay");
 // });
 
-app.get('/user', (_, res) => {
-    const myData = {
-        id: 1,
-        name: 'John',
-        age: 30
-    }
-    const myJsonData = JSON.stringify(myData);
-    res.send(myJsonData);
-});
-//Helper Functions 
+// Sending data
+// app.get("/", (req, res) => {
+//     const myData = {
+//         id: 47,
+//         email: "test@test.com"
+//     };
+//     const myJSONData = JSON.stringify(myData);
+//     res.send(myJSONData);
+// });
 
-function getAllBooks() {
-    //this gets all the book data 
-    const books = fs.readFile('../data.json', 'utf8', (_, data) => {
-    return JSON.parse(data);
-    });
-    return books;
+// Specify a route
+// app.get("/user", (req, res) => {
+//     const myData = {
+//         id: 47,
+//         email: "test@test.com"
+//     };
+//     const myJSONData = JSON.stringify(myData);
+//     res.send(myJSONData);
+// });
+
+// Specify a route with a parameter
+// app.get("/users/:user", (req, res) => {
+//     const myData = {
+//         id: req.params.user,
+//         email: "test@test.com"
+//     };
+//     const myJSONData = JSON.stringify(myData);
+//     res.send(myJSONData);
+// });
+
+// Helper functions
+async function getAllBooks() {
+    const books = await fs.readFile("../data.json", "utf-8"); // read the data.json file
+    let parsedBooks = JSON.parse(books); // parse the JSON string into a JavaScript object
+    console.log(parsedBooks); // log the parsed books to the console
+    return parsedBooks; // return the parsed books
 }
 
+// Helper function to get one book
+async function getOneBook(id) {
+  const books = await fs.readFile("../data.json", "utf-8");
+  let parsedBook = JSON.parse(books);
+  console.log(parsedBook);
+  return parsedBook[id];
+}
 
-//the user has requested all books data 
-app.get("/get-all-books", async (_, res) => {
-    const books = getAllBooks();
+async function deleteBook() {
+    const books = await fs.readFile("../data.json", "utf-8"); 
+    let parsedBooks = JSON.parse(books).splice(id, 1);
+    const stringBooks = JSON.stringify(parsedBooks);
+    await fs.writeFile("../data.json", stringBooks, "utf-8");
+}
+
+// API Endpoints
+
+// The client has requested all of the books
+app.get("/get-all-books", async (req, res) => {
+    const books = await getAllBooks();
     res.send(JSON.stringify(books));
 });
 
-app.get('/get-one-book/:id', async (req, res) => {
+// The client has requested one specific book using an ID
+app.get("/get-one-book/:id", async (req, res) => {
     const book = await getOneBook(req.params.id);
     res.send(JSON.stringify(book));
 });
 
+app.get('/delete-book/:id', async (req, res) => {
+      await deleteBook(req.params.id)
+      res.send("You deleted a book!")
+})
