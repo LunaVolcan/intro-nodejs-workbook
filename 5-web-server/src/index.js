@@ -57,16 +57,19 @@ async function getAllBooks() {
 // Helper function to get one book
 async function getOneBook(id) {
   const books = await fs.readFile("../data.json", "utf-8");
-  let parsedBook = JSON.parse(books);
-  console.log(parsedBook);
-  return parsedBook[id];
+  let parsedBooks = JSON.parse(books);
+  const book = parsedBooks.find(book => book.id == id); // finds book by id
+  console.log(book);
+  return book;
 }
 
-async function deleteBook() {
+// Helper function to delete a book by id
+async function deleteBook(id) {
     const books = await fs.readFile("../data.json", "utf-8"); 
-    let parsedBooks = JSON.parse(books).splice(id, 1);
-    const stringBooks = JSON.stringify(parsedBooks);
-    await fs.writeFile("../data.json", stringBooks, "utf-8");
+    let parsedBooks = JSON.parse(books);
+    const updatedBooks = parsedBooks.filter(book => book.id != id); // filter out the book with the matching id
+    const stringBooks = JSON.stringify(updatedBooks, null, 2);
+    await fs.writeFile("../data.json", stringBooks, "utf-8"); // write updated book list back
 }
 
 // API Endpoints
@@ -83,7 +86,8 @@ app.get("/get-one-book/:id", async (req, res) => {
     res.send(JSON.stringify(book));
 });
 
+// The client has requested to delete a book by ID
 app.get('/delete-book/:id', async (req, res) => {
-      await deleteBook(req.params.id)
-      res.send("You deleted a book!")
-})
+    await deleteBook(req.params.id);
+    res.send("You deleted a book!");
+});
