@@ -21,6 +21,7 @@ async function getAllLanguages() {
         let result = await client.query("SELECT * FROM programming_languages");
         console.log(result);
         await client.end();  //closing our connection to the database
+        return result.rows;
 }
 
 async function getOneLanguage(id) {
@@ -64,6 +65,15 @@ async function getAllLanguagesSortedByYear() {
         return result.rows;
   }
 
+async function addOneLanguage(obj) {
+         const client = new Client(config);
+         await client.connect();
+         let result = await client.query(`INSERT INTO programming_languages(id, name, released_year, githut_rank, pypl_rank, tiobe_rank) 
+         VALUES (18,  '${obj.name}', ${obj.releasedYear}, ${obj.gitHutRank}, ${obj.pyplRank}, ${obj.tiobeRank})`)
+         await client.end();
+        return result.rows;
+
+}
 
 // API Endpoint
 app.get("/get-all-languages", async (req, res) => {
@@ -95,6 +105,12 @@ app.get("/get-all-languages/sort-by-year", async (req, res) => {
   app.get("/search-languages-by-name/:name", async (req, res) => {
         let languages = await searchLanguagesByName(req.params.name);
         res.json(languages);
+  });
+
+  // Add One Language
+  app.post ("/add-one-language", async (req, res) => {
+       await addOneLanguage(req.body);
+       res.send("Language added successfully! Yay!");
   });
 
 
